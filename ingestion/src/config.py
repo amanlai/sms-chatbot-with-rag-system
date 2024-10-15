@@ -5,4 +5,5 @@ DEBUG = False
 INDEX_NAME = "business_description"
 LOCAL = False
 MODEL_NAME = "text-embedding-3-large"   # "text-embedding-ada-002"
+USE_LLAMA_INDEX = False
 USE_RECURSIVE_SPLITTER = False

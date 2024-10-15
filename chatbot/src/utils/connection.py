@@ -46,9 +46,15 @@ from .config import (
     RESPONSE_AT_RECURSION_ERROR,
     TWILIO_ERROR_MESSAGE,
     USE_LEGACY_AGENT,
+    USE_LLAMA_INDEX,
     USE_PLAN_EXECUTE
 )
 
+
+if USE_LLAMA_INDEX:
+    from llama_index.core import VectorStoreIndex
+    from llama_index.embeddings.openai import OpenAIEmbedding
+    from agents.memory.vector_search import MongoDBAtlasVectorSearch
 
 BUSINESS_NAME = getenv("BUSINESS_NAME")
 MONGO_CHAT_HISTORY_URI = getenv("CHAT_HISTORY_MONGO_URI")
@@ -196,6 +202,18 @@ class MongoDBConnection:
         return checkpointer
 
     def get_vector_store(self) -> MongoDBAtlasVectorSearch:
+        if USE_LLAMA_INDEX:
+            # Instantiate the vector store
+            atlas_vector_store = MongoDBAtlasVectorSearch(
+                self.vector_store_client,
+                db_name=self.db_name,
+                collection_name=BUSINESS_NAME,
+                vector_index_name=INDEX_NAME
+            )
+            return VectorStoreIndex.from_vector_store(
+                vector_store=atlas_vector_store,
+                embed_model=OpenAIEmbedding(model=EMBEDDING_MODEL_NAME),
+            )
         # connect to mongodb collection
         db = self.vector_store_client[self.db_name]
         collection = db[BUSINESS_NAME]

@@ -8,7 +8,16 @@ from langchain_mongodb.utils import make_serializable
 
 # from motor.motor_asyncio import AsyncIOMotorCollection
 from pymongo.collection import Collection
-from ...utils.config import RUN_EXACT_NEAREST_NEIGHBOR_VECTOR_SEARCH
+from ...utils.config import (
+    RUN_EXACT_NEAREST_NEIGHBOR_VECTOR_SEARCH,
+    USE_LLAMA_INDEX
+)
+
+
+if USE_LLAMA_INDEX:
+    from langchain_core.vectorstores import VectorStore
+    from llama_index.vector_stores.mongodb import MongoDBAtlasVectorSearch as LlamaMongoDBAtlasVectorSearch  # noqa: E501
+
 
 
 def vector_search_stage(
@@ -127,3 +136,11 @@ class MongoDBAtlasVectorSearchWithENN(MongoDBAtlasVectorSearch):
             make_serializable(res)
             docs.append((Document(page_content=text, metadata=res), score))
         return docs
+
+
+if USE_LLAMA_INDEX:
+
+    class MongoDBAtlasVectorSearch(LlamaMongoDBAtlasVectorSearch, VectorStore):
+
+        def __init__(self, **kwargs: Any):
+            super().__init__(**kwargs)

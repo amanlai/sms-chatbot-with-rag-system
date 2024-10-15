@@ -15,7 +15,7 @@ from ...typing import (
     PlanExecute as State,
     Response,
 )
-from utils.config import DEBUG, LOCAL_DEBUG
+from utils.config import DEBUG, LOCAL_DEBUG, USE_LLAMA_INDEX
 
 
 class NodeActions(BaseNodeChains):
@@ -217,8 +217,9 @@ class NodeActions(BaseNodeChains):
         formatted_docs = await self._format_docs(documents)
         # input = self._format_template(state["input"], formatted_docs)
         if DEBUG:
-            print(
-                "-------RETRIEVED DOCUMENT SCORES-------\n",
-                *(f'{x.metadata["_id"]}: {x.metadata["score"]}\n' for x in documents),  # noqa: E501
-            )
+            print("-------RETRIEVED DOCUMENT SCORES-------")
+            if USE_LLAMA_INDEX:
+                print(*(f"{x.node.id_}: {x.score}\n" for x in documents))
+            else:
+                print(*(f'{x.metadata["_id"]}: {x.metadata["score"]}\n' for x in documents))  # noqa: E501
         return {"retrieved_context": formatted_docs, "response": None}

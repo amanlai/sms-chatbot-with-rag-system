@@ -14,6 +14,7 @@ MAX_TOKENS_AFTER_TRIMMING = 100                # used trim chat history
 OPENAI_CLIENT_TIMEOUT = 5
 RECURSION_LIMIT = 50                           # langgraph recursion limit
 USE_LEGACY_AGENT = False
+USE_LLAMA_INDEX = False
 USE_PLAN_EXECUTE = False
 WELCOME_PAGE_VALUE = """Welcome to Chattabot!\n
 I'm your personal assistant, ready to answer your questions. I'm still \

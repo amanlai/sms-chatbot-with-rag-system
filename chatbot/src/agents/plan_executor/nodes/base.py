@@ -29,6 +29,7 @@ from ...typing import (
 from utils.config import (
     TIMEZONE,
     RETRIEVER_POST_FILTER_MIN_SIMILARITY_SCORE,
+    USE_LLAMA_INDEX,
     USE_PLAN_EXECUTE
 )
 
@@ -58,6 +59,8 @@ class BaseNodeChains(BaseChains):
             super().__init__(**kwargs)
 
     async def _format_docs(self, docs: list[Document]) -> str:
+        if USE_LLAMA_INDEX:
+            return "\n\n".join([node.node.text for node in docs])
         return "\n\n".join(
             [
                 await self._retrieve_prompt.aformat(content=doc.page_content)
@@ -128,6 +131,8 @@ class BaseNodeChains(BaseChains):
         k: int = 3,
         include_scores: bool = True,
     ) -> VectorStoreRetriever:
+        if USE_LLAMA_INDEX:
+            return vector_store.as_retriever(similarity_top_k=k)
         retriever = vector_store.as_retriever(
             search_type=search_type,
             search_kwargs={
